@@ -1,0 +1,322 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Tagesschrift', system-ui, sans-serif;
+    scroll-behavior: smooth;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-dark-300 text-gray-100 font-sans;
+  overflow-x: hidden;
+  perspective: 1000px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-dark-400;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary-500;
+}
+
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-accent-400;
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.glass {
+  @apply backdrop-blur-md bg-opacity-10 bg-white border border-gray-800 border-opacity-20;
+  animation: glass-shine 8s linear infinite;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.glass:hover {
+  transform: translateZ(20px) rotateX(2deg) rotateY(2deg);
+}
+
+@keyframes glass-shine {
+  0%, 100% {
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+  }
+}
+
+.card-glow {
+  @apply relative;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+
+.card-glow:hover {
+  transform: translateY(-10px) translateZ(20px) rotateX(2deg) rotateY(2deg);
+}
+
+.card-glow::before {
+  content: '';
+  @apply absolute -inset-0.5 rounded-lg bg-gradient-to-r from-primary-500 to-accent-500 opacity-0 transition duration-300;
+  z-index: -1;
+  animation: pulse-border 3s ease-in-out infinite;
+  filter: blur(8px);
+}
+
+.card-glow:hover::before {
+  @apply opacity-70;
+  animation: pulse-border-hover 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.15;
+  }
+}
+
+@keyframes pulse-border-hover {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px) rotateX(-10deg);
+  transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+
+.animate-on-scroll.show {
+  opacity: 1;
+  transform: translateY(0) rotateX(0);
+}
+
+.nav-link {
+  position: relative;
+  overflow: hidden;
+  transition: color 0.3s ease;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.nav-link:hover::before {
+  left: 100%;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(to right, theme(colors.primary.400), theme(colors.accent.400));
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover::after {
+  left: 0;
+  width: 100%;
+}
+
+.button-hover {
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+
+.button-hover:hover {
+  transform: scale(1.05) translateZ(10px);
+}
+
+.button-hover:active {
+  transform: scale(0.95) translateZ(5px);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(5px, -10px) rotate(2deg);
+  }
+  75% {
+    transform: translate(-5px, -15px) rotate(-2deg);
+  }
+}
+
+.float {
+  animation: float 8s ease-in-out infinite;
+}
+
+.text-shine {
+  background: linear-gradient(
+    90deg,
+    theme(colors.primary.400) 0%,
+    theme(colors.accent.400) 25%,
+    theme(colors.primary.400) 50%,
+    theme(colors.accent.400) 75%,
+    theme(colors.primary.400) 100%
+  );
+  background-size: 200% auto;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: shine 8s linear infinite;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+}
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+.parallax-layer {
+  will-change: transform;
+  transform-style: preserve-3d;
+  transition: transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.scale-hover {
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+
+.scale-hover:hover {
+  transform: scale(1.1) translateZ(20px);
+}
+
+.rotate-hover {
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+
+.rotate-hover:hover {
+  transform: rotate(8deg) scale(1.05) translateZ(10px);
+}
+
+.gradient-animate {
+  background: linear-gradient(
+    -45deg,
+    theme(colors.primary.500),
+    theme(colors.accent.500),
+    theme(colors.primary.400),
+    theme(colors.accent.400)
+  );
+  background-size: 400% 400%;
+  animation: gradient-flow 15s ease infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.gradient-animate::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 50%
+  );
+  animation: gradient-shine 8s linear infinite;
+}
+
+@keyframes gradient-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes gradient-shine {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.fade-in {
+  animation: fadeIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-30px) rotateY(-10deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) rotateY(0);
+  }
+}
+
+.magnetic-button {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.magnetic-button:hover {
+  transform: translate(var(--x, 0), var(--y, 0));
+}
