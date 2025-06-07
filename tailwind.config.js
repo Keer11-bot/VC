@@ -1,0 +1,156 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Tagesschrift', 'system-ui', 'sans-serif'],
+      },
+      colors: {
+        primary: {
+          50: '#e6f1fe',
+          100: '#cce3fd',
+          200: '#99c7fb',
+          300: '#66abf9',
+          400: '#338ff7',
+          500: '#0073f5',
+          600: '#005cc4',
+          700: '#004593',
+          800: '#002e62',
+          900: '#001731',
+          950: '#000b19',
+        },
+        secondary: {
+          50: '#f0f7ff',
+          100: '#e0f0ff',
+          200: '#c2e0ff',
+          300: '#a3d1ff',
+          400: '#85c1ff',
+          500: '#66b2ff',
+          600: '#528ecc',
+          700: '#3d6b99',
+          800: '#294766',
+          900: '#142433',
+          950: '#0a121a',
+        },
+        accent: {
+          50: '#e6f8ff',
+          100: '#ccf2ff',
+          200: '#99e5ff',
+          300: '#66d8ff',
+          400: '#33cbff',
+          500: '#00beff',
+          600: '#0098cc',
+          700: '#007299',
+          800: '#004c66',
+          900: '#002633',
+          950: '#00131a',
+        },
+        dark: {
+          100: '#0a1628',
+          200: '#081220',
+          300: '#060e18',
+          400: '#040a10',
+          500: '#020508',
+        },
+        success: {
+          50: '#f0fdf4',
+          100: '#dcfce7',
+          200: '#bbf7d0',
+          300: '#86efac',
+          400: '#4ade80',
+          500: '#22c55e',
+          600: '#16a34a',
+          700: '#15803d',
+          800: '#166534',
+          900: '#14532d',
+          950: '#052e16',
+        },
+        warning: {
+          50: '#fff7ed',
+          100: '#ffedd5',
+          200: '#fed7aa',
+          300: '#fdba74',
+          400: '#fb923c',
+          500: '#f97316',
+          600: '#ea580c',
+          700: '#c2410c',
+          800: '#9a3412',
+          900: '#7c2d12',
+          950: '#431407',
+        },
+        error: {
+          50: '#fef2f2',
+          100: '#fee2e2',
+          200: '#fecaca',
+          300: '#fca5a5',
+          400: '#f87171',
+          500: '#ef4444',
+          600: '#dc2626',
+          700: '#b91c1c',
+          800: '#991b1b',
+          900: '#7f1d1d',
+          950: '#450a0a',
+        },
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        pulse: {
+          '0%, 100%': { opacity: 1 },
+          '50%': { opacity: 0.5 },
+        },
+        glow: {
+          '0%, 100%': { 
+            boxShadow: '0 0 5px theme(colors.primary.500), 0 0 10px theme(colors.primary.500)',
+            opacity: 1 
+          },
+          '50%': { 
+            boxShadow: '0 0 20px theme(colors.primary.500), 0 0 30px theme(colors.primary.500)',
+            opacity: 0.7 
+          },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+        tilt: {
+          '0%, 100%': { transform: 'rotate(0deg)' },
+          '25%': { transform: 'rotate(2deg)' },
+          '75%': { transform: 'rotate(-2deg)' },
+        },
+        magnetic: {
+          '0%, 100%': { transform: 'translate(0, 0)' },
+          '50%': { transform: 'translate(var(--x, 0), var(--y, 0))' },
+        },
+      },
+      animation: {
+        float: 'float 6s ease-in-out infinite',
+        'float-slow': 'float 8s ease-in-out infinite',
+        'float-fast': 'float 4s ease-in-out infinite',
+        pulse: 'pulse 3s ease-in-out infinite',
+        glow: 'glow 3s ease-in-out infinite',
+        shimmer: 'shimmer 8s linear infinite',
+        tilt: 'tilt 10s ease-in-out infinite',
+        magnetic: 'magnetic 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'hero-pattern': 'linear-gradient(to bottom right, rgba(10, 22, 40, 0.95), rgba(6, 14, 24, 0.95))',
+      },
+      transitionTimingFunction: {
+        'bounce-soft': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+      },
+      perspective: {
+        '1000': '1000px',
+        '2000': '2000px',
+      },
+      transformStyle: {
+        '3d': 'preserve-3d',
+      },
+    },
+  },
+  plugins: [],
+};
