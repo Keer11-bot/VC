@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, useAnimation, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Shield, Layers, Zap } from 'lucide-react';
 import SectionTitle from './ui/SectionTitle';
@@ -23,14 +23,17 @@ const Features: React.FC = () => {
   const floatAnimation = useAnimation();
 
   // Track if component is mounted
-  const isMounted = useRef(false);
+  const isMounted = useRef(true);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const animationRef = useRef<Promise<any> | null>(null);
 
+  // Define features array outside of render to prevent recreation
   const features = [
     {
       icon: <Shield className="h-8 w-8" />,
       title: 'Secure & Reliable',
       description: 'Enterprise-grade security with 99.9% uptime guarantee to keep your business running smoothly.',
-      strength: "95",
+      strength: 85,
       color: 'from-blue-500 to-blue-600',
       image: 'https://images.pexels.com/photos/60504/security-protection-anti-virus-software-60504.jpeg?auto=compress&cs=tinysrgb&w=800'
     },
@@ -38,7 +41,7 @@ const Features: React.FC = () => {
       icon: <Layers className="h-8 w-8" />,
       title: 'Scalable Architecture',
       description: 'Our solutions grow with your business, from startup to enterprise, without missing a beat.',
-      strength: "90",
+      strength: 92,
       color: 'from-green-500 to-green-600',
       image: 'https://images.pexels.com/photos/1181271/pexels-photo-1181271.jpeg?auto=compress&cs=tinysrgb&w=800'
     },
@@ -46,72 +49,107 @@ const Features: React.FC = () => {
       icon: <Zap className="h-8 w-8" />,
       title: 'Lightning Fast',
       description: 'Optimized for performance with global CDN and edge caching for lightning-fast load times.',
-      strength: "98",
+      strength: 96,
       color: 'from-yellow-500 to-orange-600',
       image: 'https://images.pexels.com/photos/7531991/pexels-photo-7531991.jpeg?auto=compress&cs=tinysrgb&w=600'
     },
   ];
 
+  // Memoized mouse handlers to prevent recreation on every render
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!imageRef.current || !isMounted.current) return;
+    
+    try {
+      const rect = imageRef.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      x.set(e.clientX - centerX);
+      y.set(e.clientY - centerY);
+    } catch (error) {
+      console.warn('Error in mouse move handler:', error);
+    }
+  }, [x, y]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (!isMounted.current) return;
+    
+    try {
+      x.set(0);
+      y.set(0);
+    } catch (error) {
+      console.warn('Error in mouse leave handler:', error);
+    }
+  }, [x, y]);
+
+  // Floating animation with proper cleanup
   useEffect(() => {
     isMounted.current = true;
 
-    // Floating animation sequence
     const startFloatingAnimation = async () => {
-      if (!isMounted.current) return;
-      
       try {
-        await floatAnimation.start({
-          y: [0, -15, 0, 15, 0],
-          transition: {
-            duration: 6,
-            ease: "easeInOut",
-            repeat: Infinity,
-            repeatType: "loop"
+        while (isMounted.current) {
+          if (!isMounted.current) break;
+          
+          animationRef.current = floatAnimation.start({
+            y: [0, -15, 0, 15, 0],
+            transition: {
+              duration: 6,
+              ease: "easeInOut",
+              repeat: 0, // Don't use infinite repeat in the animation itself
+            }
+          });
+          
+          await animationRef.current;
+          
+          // Small delay between cycles to prevent overwhelming the browser
+          if (isMounted.current) {
+            await new Promise(resolve => setTimeout(resolve, 100));
           }
-        });
+        }
       } catch (error) {
-        // Handle animation error gracefully
-        console.warn('Animation error:', error);
+        // Animation was cancelled or component unmounted
+        console.warn('Floating animation stopped:', error);
       }
     };
 
-    // Start animation after a small delay to ensure component is mounted
-    const animationTimeout = setTimeout(() => {
-      if (isMounted.current) {
-        startFloatingAnimation();
-      }
-    }, 100);
+    startFloatingAnimation();
 
-    // Auto-cycle through features
-    const interval = setInterval(() => {
+    return () => {
+      isMounted.current = false;
+      if (animationRef.current) {
+        floatAnimation.stop();
+      }
+    };
+  }, [floatAnimation]);
+
+  // Auto-cycle through features with proper cleanup
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
       if (isMounted.current) {
         setActiveFeature(prev => (prev + 1) % features.length);
       }
     }, 5000);
 
     return () => {
-      isMounted.current = false;
-      clearTimeout(animationTimeout);
-      clearInterval(interval);
-      floatAnimation.stop();
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
-  }, [floatAnimation, features.length]);
+  }, [features.length]);
 
-  // Mouse move handler for 3D effect
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!imageRef.current) return;
-    const rect = imageRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    x.set(e.clientX - centerX);
-    y.set(e.clientY - centerY);
-  };
-
-  // Reset position on mouse leave
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      if (animationRef.current) {
+        floatAnimation.stop();
+      }
+    };
+  }, [floatAnimation]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -257,11 +295,10 @@ const Features: React.FC = () => {
                     repeatType: "loop"
                   }}
                 >
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.2)_0%,_transparent_70%)]"></div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="animate-pulse w-32 h-32 rounded-full bg-white/10"></div>
+                    <div className="w-32 h-32 rounded-full bg-white/10 animate-pulse"></div>
                   </div>
-                  {/* Image container replacing the icon */}
+                  {/* Image container */}
                   <motion.div
                     className="relative z-10 w-full h-full flex items-center justify-center"
                     animate={{
@@ -279,6 +316,12 @@ const Features: React.FC = () => {
                         src={features[activeFeature].image}
                         alt={features[activeFeature].title}
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        onError={(e) => {
+                          console.warn('Image failed to load:', features[activeFeature].image);
+                          // Fallback to a solid color background
+                          e.currentTarget.style.display = 'none';
+                        }}
                       />
                     </div>
                   </motion.div>
@@ -294,52 +337,32 @@ const Features: React.FC = () => {
                     {features[activeFeature].title}
                   </motion.h3>
                   <div className="mt-4 w-24 h-1 bg-white/30 rounded-full"></div>
-                  <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-0">
-                    <svg preserveAspectRatio="none" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"
-                      className="relative block w-[112%] h-[60px] rotate-0">
-                      <motion.path
-                        d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z"
-                        opacity=".25"
-                        className="fill-white"
-                        animate={{
-                          d: [
-                            "M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z",
-                            "M0,0V46.29c47.79,22.2,95.59,42.17,178,38,84.36-5.37,132.33-33.31,202.8-37.5C454.64,42.43,504.34,53.67,583,72.05c39.27,18,148.3,14.88,209.4,3.08,56.15-6,79.85-17.84,114.45-29.34C999.49,35,1113-14.29,1200,52.47V0Z",
-                            "M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z"
-                          ]
-                        }}
-                        transition={{
-                          duration: 10,
-                          repeat: Infinity,
-                          repeatType: "loop"
-                        }}
-                      />
-                    </svg>
-                  </div>
                 </motion.div>
                 {/* Highlight effect */}
-                <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-white/5 to-white/10 blur-sm group-hover:blur-md transition-all duration-1000 opacity-70"></div>
+                <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-white/5 to-white/10 blur-sm transition-all duration-1000 opacity-70"></div>
                 <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-white/5 to-transparent blur-md"></div>
-                {/* Floating particles */}
-                {[...Array(8)].map((_, i) => (
+                {/* Simplified floating particles */}
+                {[...Array(6)].map((_, i) => (
                   <motion.div
                     key={i}
                     className="absolute w-2 h-2 rounded-full bg-white/30"
                     initial={{
-                      x: Math.random() * 400 - 200,
-                      y: Math.random() * 400 - 200,
-                      opacity: 0.1 + Math.random() * 0.5,
-                      scale: 0.2 + Math.random() * 0.8
+                      x: (i % 3) * 100 - 100,
+                      y: Math.floor(i / 3) * 100 - 100,
+                      opacity: 0.3,
+                      scale: 0.5
                     }}
                     animate={{
-                      x: Math.random() * 400 - 200,
-                      y: Math.random() * 400 - 200,
-                      opacity: [0.1 + Math.random() * 0.5, 0.5 + Math.random() * 0.5, 0.1 + Math.random() * 0.5]
+                      x: [(i % 3) * 100 - 100, (i % 3) * 120 - 120, (i % 3) * 100 - 100],
+                      y: [Math.floor(i / 3) * 100 - 100, Math.floor(i / 3) * 120 - 120, Math.floor(i / 3) * 100 - 100],
+                      opacity: [0.3, 0.6, 0.3],
+                      scale: [0.5, 0.8, 0.5]
                     }}
                     transition={{
-                      duration: 5 + Math.random() * 10,
+                      duration: 8 + (i * 0.5),
                       repeat: Infinity,
-                      repeatType: "reverse"
+                      repeatType: "loop",
+                      ease: "easeInOut"
                     }}
                   />
                 ))}
@@ -347,19 +370,6 @@ const Features: React.FC = () => {
             </div>
           </motion.div>
         </div>
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="mt-20 text-center"
-        >
-          <button className="relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 text-white px-10 py-4 rounded-full group hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300">
-            <span className="relative z-10">Explore All Features</span>
-            <span className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            <span className="absolute top-0 right-full w-full h-full bg-white/20 group-hover:translate-x-full transition-transform duration-700"></span>
-          </button>
-        </motion.div>
       </div>
       {/* Background elements */}
       <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-gray-800 to-transparent"></div>
