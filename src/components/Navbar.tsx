@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, LogOut } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-import LogoutModal from './components/LogoutModal';
+import LogoutModal from './LogoutModal';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
