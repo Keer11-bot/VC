@@ -34,7 +34,7 @@ const Features: React.FC = () => {
       title: 'Secure & Reliable',
       description: 'Enterprise-grade security with 99.9% uptime guarantee to keep your business running smoothly.',
       strength: 85,
-      color: 'from-blue-500 to-blue-600',
+      color: 'from-gray-800 to-gray-900',
       image: 'https://images.pexels.com/photos/60504/security-protection-anti-virus-software-60504.jpeg?auto=compress&cs=tinysrgb&w=800'
     },
     {
@@ -42,7 +42,7 @@ const Features: React.FC = () => {
       title: 'Scalable Architecture',
       description: 'Our solutions grow with your business, from startup to enterprise, without missing a beat.',
       strength: 92,
-      color: 'from-green-500 to-green-600',
+      color: 'from-gray-800 to-gray-900',
       image: 'https://images.pexels.com/photos/1181271/pexels-photo-1181271.jpeg?auto=compress&cs=tinysrgb&w=800'
     },
     {
@@ -50,7 +50,7 @@ const Features: React.FC = () => {
       title: 'Lightning Fast',
       description: 'Optimized for performance with global CDN and edge caching for lightning-fast load times.',
       strength: 96,
-      color: 'from-yellow-500 to-orange-600',
+      color: 'from-gray-800 to-gray-900',
       image: 'https://images.pexels.com/photos/7531991/pexels-photo-7531991.jpeg?auto=compress&cs=tinysrgb&w=600'
     },
   ];
