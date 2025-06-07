@@ -2,52 +2,58 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 interface SectionTitleProps {
-  subtitle: string;
+  subtitle?: string;
   title: string;
   description?: string;
-  alignment?: 'center' | 'left';
+  className?: string;
 }
 
-const SectionTitle: React.FC<SectionTitleProps> = ({ 
-  subtitle, 
-  title, 
-  description, 
-  alignment = 'center' 
+const SectionTitle: React.FC<SectionTitleProps> = ({
+  subtitle,
+  title,
+  description,
+  className = ""
 }) => {
   return (
-    <div className={`max-w-3xl ${alignment === 'center' ? 'mx-auto text-center' : 'text-left'}`}>
-      <motion.span
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5 }}
-        className="inline-block px-3 py-1 text-xs font-medium text-primary-400 bg-primary-400/10 rounded-full mb-4"
-      >
-        {subtitle}
-      </motion.span>
-      
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
+      className={`text-center max-w-3xl mx-auto ${className}`}
+    >
+      {subtitle && (
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="text-blue-400 font-medium text-lg mb-4"
+        >
+          {subtitle}
+        </motion.p>
+      )}
       <motion.h2
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="text-3xl md:text-4xl font-bold mb-4"
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="text-4xl md:text-5xl font-bold text-white mb-6"
       >
         {title}
       </motion.h2>
-      
       {description && (
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-gray-400 text-lg"
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="text-gray-400 text-lg leading-relaxed"
         >
           {description}
         </motion.p>
       )}
-    </div>
+    </motion.div>
   );
 };
 
