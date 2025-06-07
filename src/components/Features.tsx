@@ -20,18 +20,46 @@ const Features: React.FC = () => {
   const springRotateY = useSpring(rotateY, springConfig);
 
   // Floating animation
-  const floatY = useMotionValue(0);
   const floatAnimation = useAnimation();
 
   // Track if component is mounted
-  const isMounted = useRef(true);
+  const isMounted = useRef(false);
+
+  const features = [
+    {
+      icon: <Shield className="h-8 w-8" />,
+      title: 'Secure & Reliable',
+      description: 'Enterprise-grade security with 99.9% uptime guarantee to keep your business running smoothly.',
+      strength: "95",
+      color: 'from-blue-500 to-blue-600',
+      image: 'https://images.pexels.com/photos/60504/security-protection-anti-virus-software-60504.jpeg?auto=compress&cs=tinysrgb&w=800'
+    },
+    {
+      icon: <Layers className="h-8 w-8" />,
+      title: 'Scalable Architecture',
+      description: 'Our solutions grow with your business, from startup to enterprise, without missing a beat.',
+      strength: "90",
+      color: 'from-green-500 to-green-600',
+      image: 'https://images.pexels.com/photos/1181271/pexels-photo-1181271.jpeg?auto=compress&cs=tinysrgb&w=800'
+    },
+    {
+      icon: <Zap className="h-8 w-8" />,
+      title: 'Lightning Fast',
+      description: 'Optimized for performance with global CDN and edge caching for lightning-fast load times.',
+      strength: "98",
+      color: 'from-yellow-500 to-orange-600',
+      image: 'https://images.pexels.com/photos/7531991/pexels-photo-7531991.jpeg?auto=compress&cs=tinysrgb&w=600'
+    },
+  ];
 
   useEffect(() => {
     isMounted.current = true;
 
     // Floating animation sequence
     const startFloatingAnimation = async () => {
-      while (isMounted.current) {
+      if (!isMounted.current) return;
+      
+      try {
         await floatAnimation.start({
           y: [0, -15, 0, 15, 0],
           transition: {
@@ -41,21 +69,33 @@ const Features: React.FC = () => {
             repeatType: "loop"
           }
         });
+      } catch (error) {
+        // Handle animation error gracefully
+        console.warn('Animation error:', error);
       }
     };
 
-    startFloatingAnimation();
+    // Start animation after a small delay to ensure component is mounted
+    const animationTimeout = setTimeout(() => {
+      if (isMounted.current) {
+        startFloatingAnimation();
+      }
+    }, 100);
 
     // Auto-cycle through features
     const interval = setInterval(() => {
-      setActiveFeature(prev => (prev + 1) % features.length);
+      if (isMounted.current) {
+        setActiveFeature(prev => (prev + 1) % features.length);
+      }
     }, 5000);
 
     return () => {
       isMounted.current = false;
+      clearTimeout(animationTimeout);
       clearInterval(interval);
+      floatAnimation.stop();
     };
-  }, []);
+  }, [floatAnimation, features.length]);
 
   // Mouse move handler for 3D effect
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -72,33 +112,6 @@ const Features: React.FC = () => {
     x.set(0);
     y.set(0);
   };
-
-  const features = [
-    {
-      icon: <Shield className="h-8 w-8" />,
-      title: 'Secure & Reliable',
-      description: 'Enterprise-grade security with 99.9% uptime guarantee to keep your business running smoothly.',
-      strength: "",
-      color: 'from-black-500 to-black-600',
-      image: 'https://images.pexels.com/photos/60504/security-protection-anti-virus-software-60504.jpeg?auto=compress&cs=tinysrgb&w=800'
-    },
-    {
-      icon: <Layers className="h-8 w-8" />,
-      title: 'Scalable Architecture',
-      description: 'Our solutions grow with your business, from startup to enterprise, without missing a beat.',
-      strength: "",
-      color: 'from-black-500 to-black-600',
-      image: 'https://images.pexels.com/photos/1181271/pexels-photo-1181271.jpeg?auto=compress&cs=tinysrgb&w=800'
-    },
-    {
-      icon: <Zap className="h-8 w-8" />,
-      title: 'Lightning Fast',
-      description: 'Optimized for performance with global CDN and edge caching for lightning-fast load times.',
-      strength: "",
-      color: 'from-black-500 to-black-600',
-      image: 'https://images.pexels.com/photos/7531991/pexels-photo-7531991.jpeg?auto=compress&cs=tinysrgb&w=600'
-    },
-  ];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -140,7 +153,7 @@ const Features: React.FC = () => {
   return (
     <section
       id="features"
-      className="py-24 bg-dark-400 relative overflow-hidden"
+      className="py-24 bg-gray-900 relative overflow-hidden"
       ref={containerRef}
     >
       <div className="container mx-auto px-4">
@@ -223,7 +236,6 @@ const Features: React.FC = () => {
                 style={{
                   rotateX: springRotateX,
                   rotateY: springRotateY,
-                  y: floatY,
                   transformPerspective: 1000,
                   transformStyle: "preserve-3d"
                 }}
@@ -245,9 +257,9 @@ const Features: React.FC = () => {
                     repeatType: "loop"
                   }}
                 >
-                  {/* <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.2)_0%,_transparent_70%)]"></div> */}
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.2)_0%,_transparent_70%)]"></div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="animate-ping-slow w-32 h-32 rounded-full bg-white/10"></div>
+                    <div className="animate-pulse w-32 h-32 rounded-full bg-white/10"></div>
                   </div>
                   {/* Image container replacing the icon */}
                   <motion.div
@@ -335,12 +347,25 @@ const Features: React.FC = () => {
             </div>
           </motion.div>
         </div>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="mt-20 text-center"
+        >
+          <button className="relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 text-white px-10 py-4 rounded-full group hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300">
+            <span className="relative z-10">Explore All Features</span>
+            <span className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+            <span className="absolute top-0 right-full w-full h-full bg-white/20 group-hover:translate-x-full transition-transform duration-700"></span>
+          </button>
+        </motion.div>
       </div>
       {/* Background elements */}
-      <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-dark-300 to-transparent"></div>
-      <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-dark-300 to-transparent"></div>
-      <div className="absolute top-1/4 right-20 w-64 h-64 rounded-full bg-primary-500/5 blur-3xl -z-10"></div>
-      <div className="absolute bottom-1/3 left-10 w-80 h-80 rounded-full bg-accent-500/5 blur-3xl -z-10"></div>
+      <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-gray-800 to-transparent"></div>
+      <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-gray-800 to-transparent"></div>
+      <div className="absolute top-1/4 right-20 w-64 h-64 rounded-full bg-blue-500/5 blur-3xl -z-10"></div>
+      <div className="absolute bottom-1/3 left-10 w-80 h-80 rounded-full bg-purple-500/5 blur-3xl -z-10"></div>
     </section>
   );
 };
